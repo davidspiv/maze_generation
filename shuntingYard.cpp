@@ -32,21 +32,32 @@ deque<string> shuntingYard(string inputString) {
   stack<string> holding;
   deque<string> output;
   string valueBuffer = "";
+  bool negativeFlag = false;
+  bool operatorFlag = false;
 
   for (size_t i = 0; i < inputString.length(); i++) {
     if (isNumericChar(inputString[i])) {
       valueBuffer += inputString.substr(i, 1);
-
+      operatorFlag = false;
     } else {
       const string nonNumeric(1, inputString[i]);
 
       // HANDLE VALUE
       if (valueBuffer.length()) {
+        if (negativeFlag) {
+          valueBuffer = '-' + valueBuffer;
+        }
+        negativeFlag = false;
         output.push_back(valueBuffer);
         valueBuffer.clear();
       }
 
       // HANDLE NON-NUMERICS
+      if (nonNumeric == "-" && operatorFlag) {
+        negativeFlag = true;
+        continue;
+      }
+
       if (nonNumeric == ")") {
         while (holding.top() != "(") {
           output.push_back(holding.top()), holding.pop();
@@ -54,6 +65,8 @@ deque<string> shuntingYard(string inputString) {
         holding.pop();
         continue;
       }
+
+      operatorFlag = true;
 
       while (nonNumeric != "(" && !holding.empty() &&
              getOperatorPrecedence(nonNumeric) <=
@@ -66,6 +79,9 @@ deque<string> shuntingYard(string inputString) {
 
   // HANDLE LAST VALUE
   if (valueBuffer.length()) {
+    if (negativeFlag) {
+      valueBuffer = '-' + valueBuffer;
+    }
     output.push_back(valueBuffer);
   }
 
@@ -81,7 +97,8 @@ double evalReversePolishNotation(deque<string> rpn) {
   stack<double> result;
 
   for (const string &token : rpn) {
-    if (isNumericChar(token[0])) {
+    if (isNumericChar(token[0]) ||
+        (token.length() > 1 && isNumericChar(token[1]))) {
       result.push(stod(token));
     } else {
       const double operandB = result.top();
@@ -113,8 +130,8 @@ double evalReversePolishNotation(deque<string> rpn) {
 }
 
 int main() {
-  const double answer = (3 + 4) * ((4 * 3) - 1) / (3.5 - 4);
-  const string inputString = "(3+4)*((4*3)-1)/(3.5-4)";
+  const double answer = (4 - 3 + -2 * 7) + 8 / (6 + -0.003) / -2.2;
+  const string inputString = "(4-3+-2*7)+8/(6+-0.003)/-2.2";
 
   const deque<string> rpn = shuntingYard(inputString);
   const double result = evalReversePolishNotation(rpn);
