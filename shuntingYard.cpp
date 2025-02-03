@@ -131,7 +131,7 @@ double evalReversePolishNotation(deque<string> rpn) {
 
 int main() {
   const double answer = (4 - 3 + -2 * 7) + 8 / (6 + -0.003) / -2.2;
-  const string inputString = "(4-3+-2*7)+8/(6+-0.003)/-2.2";
+  const string inputString = "(4-3+-2*7)+8/(6+(-0.003))/-2.2";
 
   const deque<string> rpn = shuntingYard(inputString);
   const double result = evalReversePolishNotation(rpn);
