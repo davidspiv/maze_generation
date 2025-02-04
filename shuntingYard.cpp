@@ -8,23 +8,19 @@
 
 using namespace std;
 
-struct Token
+bool isNumeric(string token)
 {
-   string text;
-   bool isNumeric;
-};
-
-bool isNumeric(string symbolString)
-{
-   return (isdigit(symbolString[0]) || symbolString[0] == '.') ||
-          (symbolString.length() > 1 &&
-           (isdigit(symbolString[1]) || symbolString[1] == '.'));
+   if (!token.empty() && (isdigit(token[0]) || token[0] == '.'))
+   {
+      return true;
+   }
+   return token.size() > 1 && (isdigit(token[1]) || token[1] == '.');
 }
 
 // Removes unary negation operator (-) and whitespace
-deque<Token> tokenize(string inputString)
+deque<string> tokenize(string inputString)
 {
-   deque<Token> tokens;
+   deque<string> tokens;
    string valueTokenBuffer = "";
 
    for (size_t i = 0; i < inputString.length(); i++)
@@ -34,32 +30,32 @@ deque<Token> tokenize(string inputString)
 
       if (isNumeric(symbol))
       {
-         valueTokenBuffer += inputString.substr(i, 1);
+         valueTokenBuffer += inputString[i];
       }
 
       if (!isNumeric(symbol) || i == lastIndex)
       {
-         if (valueTokenBuffer.length())
+         if (!valueTokenBuffer.empty())
          {
-            tokens.push_back({valueTokenBuffer, 1});
+            tokens.push_back(valueTokenBuffer);
             valueTokenBuffer.clear();
          }
 
-         if (symbol == "-" &&
-             (!i || (!tokens.back().isNumeric && tokens.back().text != ")")))
+         if (symbol == "-" && (tokens.empty() || (!isNumeric(tokens.back()) &&
+                                                  tokens.back() != ")")))
          {
-            valueTokenBuffer = '-' + valueTokenBuffer;
+            valueTokenBuffer = '-';
          }
          else if (symbol != " " && (i != lastIndex || symbol == ")"))
          {
-            tokens.push_back({symbol, 0});
+            tokens.push_back(symbol);
          }
       }
    }
    return tokens;
 }
 
-deque<string> shuntingYard(deque<Token> inputStack)
+deque<string> shuntingYard(deque<string> inputStack)
 {
    stack<char> operatorStack;
    deque<string> outputQueue;
@@ -73,13 +69,13 @@ deque<string> shuntingYard(deque<Token> inputStack)
    for (size_t i = 0; i < inputStack.size(); i++)
    {
 
-      if (inputStack[i].isNumeric)
+      if (isNumeric(inputStack[i]))
       {
-         outputQueue.push_back(inputStack[i].text);
+         outputQueue.push_back(inputStack[i]);
          continue;
       }
 
-      const char operatorChar = inputStack[i].text[0];
+      const char operatorChar = inputStack[i][0];
 
       if (operatorChar == ')')
       {
@@ -158,8 +154,9 @@ int main()
    //    const string inputString = getString("Enter Expression: ");
    const double test =
        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString = "1--1";
-   const deque<Token> tokens = tokenize(inputString);
+   const string inputString =
+       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
+   const deque<string> tokens = tokenize(inputString);
    const deque<string> rpn = shuntingYard(tokens);
    const double result = evalReversePolishNotation(rpn);
 
