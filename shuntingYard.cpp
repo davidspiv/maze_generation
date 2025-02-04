@@ -59,14 +59,11 @@ deque<Token> tokenize(string inputString)
    return tokens;
 }
 
-// Tokenizes input string and outputs result in reverse polish notation
-deque<string> shuntingYard(string inputString)
+// Outputs result in reverse polish notation
+deque<string> shuntingYard(deque<Token> inputStack)
 {
    stack<char> operatorStack;
    deque<string> outputQueue;
-   string valueTokenBuffer = "";
-   bool previousTokenIsOperator = false;
-   bool isNegative = false;
    unordered_map<char, size_t> operatorMap;
    operatorMap['+'] = 1;
    operatorMap['-'] = 2;
@@ -77,72 +74,29 @@ deque<string> shuntingYard(string inputString)
    // Tokenizes AND directs tokens within one loop of the input string.
    // Should be separated for more robust implementation (ie. to allow for
    // multiple character operators)
-   for (size_t i = 0; i < inputString.length(); i++)
+   for (size_t i = 0; i < inputStack.size(); i++)
    {
-      const char symbol = inputString[i];
+      const char tokenChar = inputStack[i].text[0];
 
-      if (isNumeric(symbol))
+      if (tokenChar == ')')
       {
-         valueTokenBuffer += inputString.substr(i, 1);
-         previousTokenIsOperator = false;
-      }
-      else
-      {
-         // HANDLE VALUE TOKEN
-         if (valueTokenBuffer.length())
-         {
-            if (isNegative)
-            {
-               valueTokenBuffer = '-' + valueTokenBuffer;
-               isNegative = false;
-            }
-            outputQueue.push_back(valueTokenBuffer);
-            valueTokenBuffer.clear();
-         }
-
-         if (symbol == ' ')
-         {
-            continue;
-         }
-
-         // HANDLE NON-NUMERIC TOKEN
-         if (symbol == '-' && previousTokenIsOperator)
-         {
-            isNegative = true;
-            continue;
-         }
-
-         if (symbol == ')')
-         {
-            while (operatorStack.top() != '(')
-            {
-               std::string operatorString(1, operatorStack.top());
-               outputQueue.push_back(operatorString), operatorStack.pop();
-            }
-            operatorStack.pop();
-            continue;
-         }
-
-         previousTokenIsOperator = true;
-
-         while (symbol != '(' && !operatorStack.empty() &&
-                operatorMap.at(symbol) <= operatorMap.at(operatorStack.top()))
+         while (operatorStack.top() != '(')
          {
             std::string operatorString(1, operatorStack.top());
             outputQueue.push_back(operatorString), operatorStack.pop();
          }
-         operatorStack.push(symbol);
+         operatorStack.pop();
+         continue;
       }
-   }
 
-   // HANDLE LAST VALUE TOKEN
-   if (valueTokenBuffer.length())
-   {
-      if (isNegative)
+      while (tokenChar != '(' && !operatorStack.empty() &&
+             operatorMap.at(tokenChar) <= operatorMap.at(operatorStack.top()))
       {
-         valueTokenBuffer = '-' + valueTokenBuffer;
+         std::string operatorString(1, operatorStack.top());
+         outputQueue.push_back(operatorString), operatorStack.pop();
       }
-      outputQueue.push_back(valueTokenBuffer);
+
+      operatorStack.push(tokenChar);
    }
 
    // FLUSH OPERATOR STACK
@@ -203,12 +157,12 @@ int main()
    //        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
    const string inputString = "1--1";
    const deque<Token> tokens = tokenize(inputString);
+   const deque<string> rpn = shuntingYard(tokens);
 
-   for (Token token : tokens)
+   for (string token : rpn)
    {
-      print(token.text);
+      print(token);
    }
-   //    const deque<string> rpn = shuntingYard(inputString);
    //    const double result = evalReversePolishNotation(rpn);
 
    //    print("Result: " + to_string(result) + '\n');
