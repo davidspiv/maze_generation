@@ -1,8 +1,8 @@
 #include <deque>
 #include <iostream>
+#include <map>
 #include <stack>
 #include <string>
-#include <unordered_map>
 
 #include "io.h"
 
@@ -59,12 +59,8 @@ deque<string> shuntingYard(deque<string> inputStack)
 {
    stack<char> operatorStack;
    deque<string> outputQueue;
-   unordered_map<char, size_t> operatorRank;
-   operatorRank['+'] = 1;
-   operatorRank['-'] = 2;
-   operatorRank['*'] = 3;
-   operatorRank['/'] = 4;
-   operatorRank['('] = 0;
+   map<char, int> operatorRank = {
+       {'+', 1}, {'-', 1}, {'*', 2}, {'/', 2}, {'(', 0}};
 
    for (size_t i = 0; i < inputStack.size(); i++)
    {
