@@ -1,6 +1,7 @@
 #include <deque>
 #include <iostream>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -18,19 +19,19 @@ bool isNumeric(string token)
 }
 
 // Removes unary negation operator (-) and whitespace
-deque<string> tokenize(string inputString)
+deque<string> tokenize(const string &inputAsString)
 {
    deque<string> tokens;
    string valueTokenBuffer = "";
 
-   for (size_t i = 0; i < inputString.length(); i++)
+   for (size_t i = 0; i < inputAsString.length(); i++)
    {
-      const string symbol(1, inputString[i]);
-      const size_t lastIndex = inputString.length() - 1;
+      const string symbol(1, inputAsString[i]);
+      const size_t lastIndex = inputAsString.length() - 1;
 
       if (isNumeric(symbol))
       {
-         valueTokenBuffer += inputString[i];
+         valueTokenBuffer += inputAsString[i];
       }
 
       if (!isNumeric(symbol) || i == lastIndex)
@@ -41,18 +42,118 @@ deque<string> tokenize(string inputString)
             valueTokenBuffer.clear();
          }
 
-         if (symbol == "-" && (tokens.empty() || (!isNumeric(tokens.back()) &&
-                                                  tokens.back() != ")")))
+         if ((symbol == "-" && tokens.empty()) ||
+             (symbol == "-" && (tokens.empty() || (!isNumeric(tokens.back()) &&
+                                                   tokens.back() != ")"))))
          {
             valueTokenBuffer = '-';
          }
-         else if (symbol != " " && (i != lastIndex || symbol == ")"))
+         else if (symbol != " " && (!isNumeric(symbol) || symbol == ")"))
          {
-            tokens.emplace_back(symbol);
+            tokens.push_back(symbol);
          }
       }
    }
    return tokens;
+}
+
+bool validAlgebraicNotation(deque<string> algebraicNotation)
+{
+   int openParentheses = 0;
+   size_t previousNumeric = 0;
+   size_t previousOperator = 0;
+   string errorMessage;
+
+   if (algebraicNotation.empty())
+   {
+      errorMessage = "empty input";
+   }
+   else if (!isNumeric(algebraicNotation.front()) &&
+            algebraicNotation.front() != "(")
+   {
+      errorMessage = "starts with an operator";
+   }
+   else if (!isNumeric(algebraicNotation.back()) &&
+            algebraicNotation.back() != ")")
+   {
+      errorMessage = "ends with an operator";
+   }
+   else
+   {
+
+      for (string token : algebraicNotation)
+      {
+         if (token == "(")
+         {
+            ++openParentheses;
+         }
+         else if (token == ")")
+         {
+            --openParentheses;
+         }
+         else if (isNumeric(token))
+         {
+            size_t decimalCount = 0;
+            for (char ch : token)
+            {
+               if (ch == '.')
+               {
+                  ++decimalCount;
+               }
+            }
+            if (token.length() == 1 && decimalCount)
+            {
+               errorMessage = "isolated decimal";
+               break;
+            }
+
+            if (decimalCount > 1)
+            {
+               errorMessage = "multiple decimals";
+               break;
+            }
+            ++previousNumeric;
+            if (previousOperator)
+            {
+               --previousOperator;
+            }
+         }
+         else
+         {
+            ++previousOperator;
+            if (!previousNumeric)
+            {
+               errorMessage = "consecutive operators";
+               break;
+            }
+            --previousNumeric;
+         }
+
+         if (openParentheses < 0)
+         {
+            errorMessage = "missing open parenthesis";
+            break;
+         }
+
+         if (previousNumeric > 1)
+         {
+            errorMessage = "consecutive numeric values";
+            break;
+         }
+      }
+   }
+
+   if (!errorMessage.length() && openParentheses)
+   {
+      errorMessage = "missing closing parenthesis";
+   }
+
+   if (errorMessage.length())
+   {
+      print("Invalid Expression: " + errorMessage);
+      return false;
+   }
+   return true;
 }
 
 deque<string> shuntingYard(deque<string> inputQueue)
@@ -66,7 +167,7 @@ deque<string> shuntingYard(deque<string> inputQueue)
    operatorRank['/'] = 2;
    operatorRank['('] = 0;
 
-   for (string token : inputQueue)
+   for (string &token : inputQueue)
    {
 
       if (isNumeric(token))
@@ -75,9 +176,9 @@ deque<string> shuntingYard(deque<string> inputQueue)
          continue;
       }
 
-      const char operatorChar = token[0];
+      const char operatorAsChar = token[0];
 
-      if (operatorChar == ')')
+      if (operatorAsChar == ')')
       {
          while (operatorStack.top() != '(')
          {
@@ -89,8 +190,8 @@ deque<string> shuntingYard(deque<string> inputQueue)
          continue;
       }
 
-      while (operatorChar != '(' && !operatorStack.empty() &&
-             operatorRank.at(operatorChar) <
+      while (operatorAsChar != '(' && !operatorStack.empty() &&
+             operatorRank.at(operatorAsChar) <
                  operatorRank.at(operatorStack.top()))
       {
 
@@ -98,7 +199,7 @@ deque<string> shuntingYard(deque<string> inputQueue)
              operatorStack.pop();
       }
 
-      operatorStack.push(operatorChar);
+      operatorStack.push(operatorAsChar);
    }
 
    while (!operatorStack.empty())
@@ -140,12 +241,14 @@ double evalExpression(deque<string> reversePolishNotation)
             result.push(operandA * operandB);
             break;
          case '/':
+            if (!operandB && operandA)
+            {
+               throw invalid_argument("ERROR: unable to divide by zero");
+            }
             result.push(operandA / operandB);
-            break;
 
          default:
-            print("ERROR: switch statement");
-            return -1;
+            throw invalid_argument("ERROR: unrecognized non-numeric");
          }
       }
    }
@@ -154,15 +257,22 @@ double evalExpression(deque<string> reversePolishNotation)
 
 int main()
 {
-   //    const string inputString = getString("Enter Expression: ");
-   const double test =
-       (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString =
-       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
-   const deque<string> algebraicNotation = tokenize(inputString);
-   const deque<string> reversePolishNotation = shuntingYard(algebraicNotation);
-   const double result = evalExpression(reversePolishNotation);
+   deque<string> algebraicNotation;
+   do
+   {
+      const string inputAsString = getString("Enter Expression: ");
+      algebraicNotation = tokenize(inputAsString);
+   } while (!validAlgebraicNotation(algebraicNotation));
 
-   print("Result: " + to_string(result) + '\n');
-   print("Test: " + to_string(test));
+   const deque<string> reversePolishNotation = shuntingYard(algebraicNotation);
+
+   try
+   {
+      const double result = evalExpression(reversePolishNotation);
+      print("Result: " + to_string(result));
+   }
+   catch (const std::exception &e)
+   {
+      std::cerr << e.what() << '\n';
+   }
 }
