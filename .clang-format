@@ -1,0 +1,6 @@
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+BreakBeforeBraces: Allman
+ColumnLimit: 79
+IndentWidth: 3
+UseTab: Never
