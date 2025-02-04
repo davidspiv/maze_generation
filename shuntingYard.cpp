@@ -1,8 +1,8 @@
 #include <deque>
 #include <iostream>
-#include <map>
 #include <stack>
 #include <string>
+#include <unordered_map>
 
 #include "io.h"
 
@@ -55,41 +55,47 @@ deque<string> tokenize(string inputString)
    return tokens;
 }
 
-deque<string> shuntingYard(deque<string> inputStack)
+deque<string> shuntingYard(deque<string> inputQueue)
 {
    stack<char> operatorStack;
    deque<string> outputQueue;
-   map<char, int> operatorRank = {
-       {'+', 1}, {'-', 1}, {'*', 2}, {'/', 2}, {'(', 0}};
+   unordered_map<char, size_t> operatorRank;
+   operatorRank['+'] = 1;
+   operatorRank['-'] = 1;
+   operatorRank['*'] = 2;
+   operatorRank['/'] = 2;
+   operatorRank['('] = 0;
 
-   for (size_t i = 0; i < inputStack.size(); i++)
+   for (string token : inputQueue)
    {
 
-      if (isNumeric(inputStack[i]))
+      if (isNumeric(token))
       {
-         outputQueue.push_back(inputStack[i]);
+         outputQueue.push_back(token);
          continue;
       }
 
-      const char operatorChar = inputStack[i][0];
+      const char operatorChar = token[0];
 
       if (operatorChar == ')')
       {
          while (operatorStack.top() != '(')
          {
-            std::string operatorString(1, operatorStack.top());
-            outputQueue.push_back(operatorString), operatorStack.pop();
+
+            outputQueue.push_back(string(1, operatorStack.top())),
+                operatorStack.pop();
          }
          operatorStack.pop();
          continue;
       }
 
       while (operatorChar != '(' && !operatorStack.empty() &&
-             operatorRank.at(operatorChar) <=
+             operatorRank.at(operatorChar) <
                  operatorRank.at(operatorStack.top()))
       {
-         std::string operatorString(1, operatorStack.top());
-         outputQueue.push_back(operatorString), operatorStack.pop();
+
+         outputQueue.push_back(string(1, operatorStack.top())),
+             operatorStack.pop();
       }
 
       operatorStack.push(operatorChar);
@@ -97,18 +103,19 @@ deque<string> shuntingYard(deque<string> inputStack)
 
    while (!operatorStack.empty())
    {
-      std::string operatorString(1, operatorStack.top());
-      outputQueue.push_back(operatorString), operatorStack.pop();
+
+      outputQueue.push_back(string(1, operatorStack.top())),
+          operatorStack.pop();
    }
 
    return outputQueue;
 }
 
-double evalReversePolishNotation(deque<string> rpn)
+double evalExpression(deque<string> reversePolishNotation)
 {
    stack<double> result;
 
-   for (const string &token : rpn)
+   for (const string &token : reversePolishNotation)
    {
       if (isNumeric(token) || (token.length() > 1 && isNumeric(token)))
       {
@@ -152,9 +159,9 @@ int main()
        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
    const string inputString =
        "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
-   const deque<string> tokens = tokenize(inputString);
-   const deque<string> rpn = shuntingYard(tokens);
-   const double result = evalReversePolishNotation(rpn);
+   const deque<string> algebraicNotation = tokenize(inputString);
+   const deque<string> reversePolishNotation = shuntingYard(algebraicNotation);
+   const double result = evalExpression(reversePolishNotation);
 
    print("Result: " + to_string(result) + '\n');
    print("Test: " + to_string(test));
