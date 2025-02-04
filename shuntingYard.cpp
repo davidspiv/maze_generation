@@ -44,11 +44,12 @@ deque<Token> tokenize(string inputString)
             valueTokenBuffer.clear();
          }
 
-         if (symbol == '-' && (!i || !tokens.back().isNumeric))
+         if (symbol == '-' &&
+             (!i || (!tokens.back().isNumeric && tokens.back().text != ")")))
          {
             valueTokenBuffer = '-' + valueTokenBuffer;
          }
-         else if (symbol != ' ' && i != lastIndex)
+         else if (symbol != ' ' && (i != lastIndex || symbol == ')'))
          {
             const string operatorString(1, symbol);
 
@@ -64,21 +65,28 @@ deque<string> shuntingYard(deque<Token> inputStack)
 {
    stack<char> operatorStack;
    deque<string> outputQueue;
-   unordered_map<char, size_t> operatorMap;
-   operatorMap['+'] = 1;
-   operatorMap['-'] = 2;
-   operatorMap['*'] = 3;
-   operatorMap['/'] = 4;
-   operatorMap['('] = 0;
+   unordered_map<char, size_t> operatorRank;
+   operatorRank['+'] = 1;
+   operatorRank['-'] = 2;
+   operatorRank['*'] = 3;
+   operatorRank['/'] = 4;
+   operatorRank['('] = 0;
 
    // Tokenizes AND directs tokens within one loop of the input string.
    // Should be separated for more robust implementation (ie. to allow for
    // multiple character operators)
    for (size_t i = 0; i < inputStack.size(); i++)
    {
-      const char tokenChar = inputStack[i].text[0];
 
-      if (tokenChar == ')')
+      if (inputStack[i].isNumeric)
+      {
+         outputQueue.push_back(inputStack[i].text);
+         continue;
+      }
+
+      const char operatorChar = inputStack[i].text[0];
+
+      if (operatorChar == ')')
       {
          while (operatorStack.top() != '(')
          {
@@ -89,14 +97,15 @@ deque<string> shuntingYard(deque<Token> inputStack)
          continue;
       }
 
-      while (tokenChar != '(' && !operatorStack.empty() &&
-             operatorMap.at(tokenChar) <= operatorMap.at(operatorStack.top()))
+      while (operatorChar != '(' && !operatorStack.empty() &&
+             operatorRank.at(operatorChar) <=
+                 operatorRank.at(operatorStack.top()))
       {
          std::string operatorString(1, operatorStack.top());
          outputQueue.push_back(operatorString), operatorStack.pop();
       }
 
-      operatorStack.push(tokenChar);
+      operatorStack.push(operatorChar);
    }
 
    // FLUSH OPERATOR STACK
@@ -152,19 +161,25 @@ double evalReversePolishNotation(deque<string> rpn)
 
 int main()
 {
-   //   const string inputString = getString("Enter Expression: ");
-   //    const double test =
-   //        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString = "1--1";
+   //    const string inputString = getString("Enter Expression: ");
+   const double test =
+       (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
+   const string inputString =
+       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
    const deque<Token> tokens = tokenize(inputString);
    const deque<string> rpn = shuntingYard(tokens);
 
-   for (string token : rpn)
-   {
-      print(token);
-   }
-   //    const double result = evalReversePolishNotation(rpn);
+   //   for (string token : rpn)
+   //   {
+   //      print(token);
+   //   }
 
-   //    print("Result: " + to_string(result) + '\n');
-   //    print("Test: " + to_string(test));
+   //   const deque<string> rpn = {"-6.3", "2.1",  "/", "5.7", "-3.4", "-",
+   //   "+",
+   //                              "4.9",  "-2.2", "/", "*",   "7.8",  "-"};
+
+   const double result = evalReversePolishNotation(rpn);
+
+   print("Result: " + to_string(result) + '\n');
+   print("Test: " + to_string(test));
 }
