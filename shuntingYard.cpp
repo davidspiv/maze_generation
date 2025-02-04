@@ -19,16 +19,16 @@ bool isNumeric(char ch)
    return isdigit(ch) || ch == '.';
 }
 
+// Separates operators and numerics. Also removes unary negation operator (-)
+// and whitespace.
 deque<Token> tokenize(string inputString)
 {
    deque<Token> tokens;
    string valueTokenBuffer = "";
-   bool isNegative = false;
 
    for (size_t i = 0; i < inputString.length(); i++)
    {
       const char symbol = inputString[i];
-      const string symbolString(1, symbol);
       const size_t lastIndex = inputString.length() - 1;
 
       if (isNumeric(symbol))
@@ -38,27 +38,21 @@ deque<Token> tokenize(string inputString)
 
       if (!isNumeric(symbol) || i == lastIndex)
       {
-         // HANDLE NUMERIC
          if (valueTokenBuffer.length())
          {
-            if (isNegative)
-            {
-               valueTokenBuffer = '-' + valueTokenBuffer;
-               isNegative = false;
-            }
             tokens.push_back({valueTokenBuffer, 1});
             valueTokenBuffer.clear();
          }
 
          if (symbol == '-' && (!i || !tokens.back().isNumeric))
          {
-            // HANDLE NEGATION OPERATOR
-            isNegative = true;
+            valueTokenBuffer = '-' + valueTokenBuffer;
          }
          else if (symbol != ' ' && i != lastIndex)
          {
-            // HANDLE BINARY OPERATOR
-            tokens.push_back({symbolString, 0});
+            const string operatorString(1, symbol);
+
+            tokens.push_back({operatorString, 0});
          }
       }
    }
@@ -207,8 +201,7 @@ int main()
    //   const string inputString = getString("Enter Expression: ");
    //    const double test =
    //        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString =
-       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
+   const string inputString = "1--1";
    const deque<Token> tokens = tokenize(inputString);
 
    for (Token token : tokens)
