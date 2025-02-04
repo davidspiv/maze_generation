@@ -207,7 +207,8 @@ int main()
    //   const string inputString = getString("Enter Expression: ");
    //    const double test =
    //        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString = "1--1";
+   const string inputString =
+       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
    const deque<Token> tokens = tokenize(inputString);
 
    for (Token token : tokens)
