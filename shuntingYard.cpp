@@ -8,9 +8,61 @@
 
 using namespace std;
 
+struct Token
+{
+   string text;
+   bool isNumeric;
+};
+
 bool isNumeric(char ch)
 {
    return isdigit(ch) || ch == '.';
+}
+
+deque<Token> tokenize(string inputString)
+{
+   deque<Token> tokens;
+   string valueTokenBuffer = "";
+   bool isNegative = false;
+
+   for (size_t i = 0; i < inputString.length(); i++)
+   {
+      const char symbol = inputString[i];
+      const string symbolString(1, symbol);
+      const size_t lastIndex = inputString.length() - 1;
+
+      if (isNumeric(symbol))
+      {
+         valueTokenBuffer += inputString.substr(i, 1);
+      }
+
+      if (!isNumeric(symbol) || i == lastIndex)
+      {
+         // HANDLE NUMERIC
+         if (valueTokenBuffer.length())
+         {
+            if (isNegative)
+            {
+               valueTokenBuffer = '-' + valueTokenBuffer;
+               isNegative = false;
+            }
+            tokens.push_back({valueTokenBuffer, 1});
+            valueTokenBuffer.clear();
+         }
+
+         if (symbol == '-' && (!i || !tokens.back().isNumeric))
+         {
+            // HANDLE NEGATION OPERATOR
+            isNegative = true;
+         }
+         else if (symbol != ' ' && i != lastIndex)
+         {
+            // HANDLE BINARY OPERATOR
+            tokens.push_back({symbolString, 0});
+         }
+      }
+   }
+   return tokens;
 }
 
 // Tokenizes input string and outputs result in reverse polish notation
@@ -153,12 +205,18 @@ double evalReversePolishNotation(deque<string> rpn)
 int main()
 {
    //   const string inputString = getString("Enter Expression: ");
-   const double test = (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
-   const string inputString =
-       "(((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8";
-   const deque<string> rpn = shuntingYard(inputString);
-   const double result = evalReversePolishNotation(rpn);
+   //    const double test =
+   //        (((-6.3 / 2.1) + (5.7 - (-3.4))) * (4.9 / (-2.2))) - 7.8;
+   const string inputString = "1--1";
+   const deque<Token> tokens = tokenize(inputString);
 
-   print("Result: " + to_string(result) + '\n');
-   print("Test: " + to_string(test));
+   for (Token token : tokens)
+   {
+      print(token.text);
+   }
+   //    const deque<string> rpn = shuntingYard(inputString);
+   //    const double result = evalReversePolishNotation(rpn);
+
+   //    print("Result: " + to_string(result) + '\n');
+   //    print("Test: " + to_string(test));
 }
