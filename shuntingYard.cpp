@@ -48,7 +48,7 @@ deque<string> tokenize(string inputString)
          }
          else if (symbol != " " && (i != lastIndex || symbol == ")"))
          {
-            tokens.push_back(symbol);
+            tokens.emplace_back(symbol);
          }
       }
    }
