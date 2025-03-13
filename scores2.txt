@@ -1,0 +1,5 @@
+Mary Jane Chu 9 7 8 9 7 5 10
+Jane Prey 10 8 8 9 7 5 10
+Alberto X. Gonzales 8 7 8 9 7 10 10
+Joe Smith 8 6 8 9 7 5 10
+Frank von Tardy 1
