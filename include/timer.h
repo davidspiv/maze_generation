@@ -6,11 +6,11 @@
 using namespace std;
 
 class Timer {
- private:
+private:
   chrono::time_point<chrono::high_resolution_clock> m_StartTimepoint =
       chrono::high_resolution_clock::now();
 
- public:
+public:
   Timer() {};
   ~Timer() { Stop(); };
 
@@ -25,7 +25,7 @@ class Timer {
                    .count();
 
     auto duration = end - start;
-    // double ms = duration * 0.001;
-    cout << "[duration]: " << duration << endl;
+    double ms = duration * 0.001;
+    cout << "duration (ms): " << ms << endl;
   }
 };
