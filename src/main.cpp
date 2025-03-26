@@ -104,7 +104,7 @@ int main() {
   Picture pic(width, height, 0, 0, 0);
 
   createMaze(pic);
-  generate(2, 2, pic);
+  generate(4, 4, pic);
 
   pic.save("result.png");
 }
