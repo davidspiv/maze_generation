@@ -194,8 +194,11 @@ build/main.o: src/main.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \
  /usr/include/c++/11/bits/stl_numeric.h /usr/include/c++/11/bit \
- /usr/include/c++/11/pstl/glue_numeric_defs.h src/../include/picture.h \
- src/../include/lodepng.h /usr/include/string.h /usr/include/strings.h
+ /usr/include/c++/11/pstl/glue_numeric_defs.h /usr/include/c++/11/stack \
+ /usr/include/c++/11/deque /usr/include/c++/11/bits/stl_deque.h \
+ /usr/include/c++/11/bits/deque.tcc /usr/include/c++/11/bits/stl_stack.h \
+ src/../include/picture.h src/../include/lodepng.h /usr/include/string.h \
+ /usr/include/strings.h
 /usr/include/stdc-predef.h:
 /usr/include/c++/11/algorithm:
 /usr/include/c++/11/utility:
@@ -439,6 +442,11 @@ build/main.o: src/main.cpp /usr/include/stdc-predef.h \
 /usr/include/c++/11/bits/stl_numeric.h:
 /usr/include/c++/11/bit:
 /usr/include/c++/11/pstl/glue_numeric_defs.h:
+/usr/include/c++/11/stack:
+/usr/include/c++/11/deque:
+/usr/include/c++/11/bits/stl_deque.h:
+/usr/include/c++/11/bits/deque.tcc:
+/usr/include/c++/11/bits/stl_stack.h:
 src/../include/picture.h:
 src/../include/lodepng.h:
 /usr/include/string.h:
