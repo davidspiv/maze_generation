@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../include/picture.h"
+#include "../include/timer.h"
 
 #define CELL_SIZE 3;
 
@@ -23,8 +24,8 @@ bool contains(std::array<int, 4> &arr, int dir) {
 int getStart(int max) { return 2 + (std::rand() % ((max - 2) / 2)) * 2; }
 
 
-void generateNewMazeCell(int startX, int startY,
-                         std::vector<std::vector<cellState>> &grid) {
+void generateNewMazeCellStack(int startX, int startY,
+                              std::vector<std::vector<cellState>> &grid) {
 
   const static std::array<std::pair<int, int>, 4> directions = {
       {{0, -2}, {0, 2}, {-2, 0}, {2, 0}}};
@@ -58,6 +59,54 @@ void generateNewMazeCell(int startX, int startY,
 
     if (!moved) {
       cellStack.pop(); // backtrack if no moves are possible
+    }
+  }
+}
+
+void generateNewMazeCellRecursive(int currX, int currY,
+                                  std::vector<std::vector<cellState>> &grid) {
+
+  // setting a pixel grey denotes the cell as "visited"
+  grid.at(currY).at(currX) = VISITED;
+
+  // maze complete
+  if (grid.at(currY - 2).at(currX) == VISITED &&
+      grid.at(currY + 2).at(currX) == VISITED &&
+      grid.at(currY).at(currX - 2) == VISITED &&
+      grid.at(currY).at(currX + 2) == VISITED) {
+    return;
+
+  } else {
+
+    // Position deltas for each of the four 2D cartesian directions; skipping
+    // every other pixel to account for walls
+    const static std::array<std::pair<int, int>, 4> directions = {
+        {{0, -2}, {0, 2}, {-2, 0}, {2, 0}}};
+
+    std::array<int, 4> moveAttempts = {-1, -1, -1, -1};
+    size_t moveNum = 0;
+
+    while (moveNum < 4) {
+
+      // randomly try each direction
+      int dir;
+      do {
+        dir = std::rand() % 4;
+      } while (contains(moveAttempts, dir));
+
+      // store direction attempt to avoid duplicates
+      moveAttempts[moveNum] = dir;
+      moveNum++;
+
+      const int nextX = currX + directions[dir].first;
+      const int nextY = currY + directions[dir].second;
+      const int midX = currX + directions[dir].first / 2;
+      const int midY = currY + directions[dir].second / 2;
+
+      if (grid.at(nextY).at(nextX) != VISITED) {
+        grid.at(midY).at(midX) = VISITED; // Create a break in a wall
+        generateNewMazeCellRecursive(nextX, nextY, grid);
+      }
     }
   }
 }
@@ -159,11 +208,17 @@ void removeBorder(std::vector<std::vector<cellState>> &grid) {
 }
 
 int main() {
+  Timer timer;
   std::srand(std::time(0));
 
-  std::pair<int, int> dimensions = getDimensions();
-  auto [width, height] = dimensions;
+  //   std::pair<int, int> dimensions = getDimensions();
+  //   auto [width, height] = dimensions;
   // Ensures odd value by rounding up
+
+
+  int width = 150;
+  int height = 150;
+
   width |= 1;
   height |= 1;
 
@@ -174,7 +229,8 @@ int main() {
       height, std::vector<cellState>(width, UNVISITED));
 
   initializeMaze(grid);
-  generateNewMazeCell(startX, startY, grid);
+  //   generateNewMazeCellRecursive(startX, startY, grid);
+  generateNewMazeCellStack(startX, startY, grid);
   //   removeBorder(grid);
-  createPicture(grid);
+  //   createPicture(grid);
 }

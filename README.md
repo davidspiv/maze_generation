@@ -10,6 +10,11 @@ This one in particular is recursive, but you can also use a stack-based solution
 * paths and walls are the same size, 1 pixel each. I want to make the paths much larger than the walls themselves.
 * Program seg-faults at 1300 x 1300 px. Why?? Recursion depth? I want to make my maze arbitrarily large and only limited by the PNG format.
 
+**Changes** \
+I changed the "elegant" recursion into a stack-based solution, and saw speed increase of about 10%. I think this highlights the fact that just because code looks good, does not mean it is optimal!
+
+And yea...C++ cooked the python code. About 1000x faster for a 150x150 maze! I can compute a 10Kx10K maze before the OS gets mad at me!
+
 **References**
 * [Blog article w/ python code](<https://aryanab.medium.com/maze-generation-recursive-backtracking-5981bc5cc766>)
 * [List of maze generation algorithms (with visualizations)](<https://professor-l.github.io/mazes/>)

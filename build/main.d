@@ -198,7 +198,8 @@ build/main.o: src/main.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/deque /usr/include/c++/11/bits/stl_deque.h \
  /usr/include/c++/11/bits/deque.tcc /usr/include/c++/11/bits/stl_stack.h \
  src/../include/picture.h src/../include/lodepng.h /usr/include/string.h \
- /usr/include/strings.h
+ /usr/include/strings.h src/../include/timer.h /usr/include/c++/11/chrono \
+ /usr/include/c++/11/ratio /usr/include/c++/11/bits/parse_numbers.h
 /usr/include/stdc-predef.h:
 /usr/include/c++/11/algorithm:
 /usr/include/c++/11/utility:
@@ -451,3 +452,7 @@ src/../include/picture.h:
 src/../include/lodepng.h:
 /usr/include/string.h:
 /usr/include/strings.h:
+src/../include/timer.h:
+/usr/include/c++/11/chrono:
+/usr/include/c++/11/ratio:
+/usr/include/c++/11/bits/parse_numbers.h:
