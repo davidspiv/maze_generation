@@ -12,7 +12,7 @@
 
 #define CELL_SIZE 3;
 
-enum cellState { WALL, UNVISITED, VISITED };
+enum cellState { WALL, UNVISITED, VISITED, PATH, WRONG_PATH };
 
 
 bool contains(std::array<int, 4> &arr, int dir) {
@@ -26,6 +26,8 @@ int getStart(int max) { return 2 + (std::rand() % ((max - 2) / 2)) * 2; }
 
 void generateNewMazeCellStack(int startX, int startY,
                               std::vector<std::vector<cellState>> &grid) {
+
+  Timer timer;
 
   const static std::array<std::pair<int, int>, 4> directions = {
       {{0, -2}, {0, 2}, {-2, 0}, {2, 0}}};
@@ -154,38 +156,58 @@ std::pair<int, int> getDimensions() {
 };
 
 
-void createPicture(std::vector<std::vector<cellState>> &grid) {
+// void createPicture(const std::vector<std::vector<cellState>> &grid,
+//                    const std::vector<std::pair<int, int>> &correctPath) {
+//   Timer timer;
+//   const int n = 1; // scale
+//   const size_t height = grid.size();
+//   const size_t width = grid.at(0).size();
+//   Picture pic(width * n, height * n, 0, 0, 0);
 
-  const int n = 4; // scale
+//   for (size_t i = 0; i < width; i++) {
+//     for (size_t j = 0; j < height; j++) {
+//       int color;
+//       switch (grid.at(j).at(i)) {
+//       case WALL:
+//         color = 255;
+//         break;
+//       case UNVISITED:
+//         color = 0;
+//         break;
+//       case VISITED:
+//       case WRONG_PATH:
+//         color = 127;
+//         break;
+//       case PATH:
+//         pic.set(i * n, j * n, 139, 232, 139);
+//         continue;
+//       default:
+//         throw std::runtime_error("Grid populated with unknown option.");
+//         break;
+//       }
+
+
+//       for (size_t k = 0; k < n; k++) {
+//         for (size_t l = 0; l < n; l++) {
+//           pic.set(i * n + k, j * n + l, color, color, color);
+//         }
+//       }
+//     }
+//   }
+
+//   pic.save("maze.png");
+// }
+
+void createPicture(const std::vector<std::vector<cellState>> &grid,
+                   const std::vector<std::pair<int, int>> &correctPath) {
+  Timer timer;
+  const int n = 1; // scale
   const size_t height = grid.size();
   const size_t width = grid.at(0).size();
   Picture pic(width * n, height * n, 0, 0, 0);
 
-  for (size_t i = 0; i < width; i++) {
-    for (size_t j = 0; j < height; j++) {
-      int color;
-      switch (grid.at(j).at(i)) {
-      case WALL:
-        color = 255;
-        break;
-      case UNVISITED:
-        color = 0;
-        break;
-      case VISITED:
-        color = 127;
-        break;
-      default:
-        throw std::runtime_error("Grid populated with unknown option.");
-        break;
-      }
-
-
-      for (size_t k = 0; k < n; k++) {
-        for (size_t l = 0; l < n; l++) {
-          pic.set(i * n + k, j * n + l, color, color, color);
-        }
-      }
-    }
+  for (size_t i = 0; i < correctPath.size(); i++) {
+    pic.set(correctPath[i].first, correctPath[i].second, 139, 232, 139);
   }
 
   pic.save("maze.png");
@@ -207,17 +229,67 @@ void removeBorder(std::vector<std::vector<cellState>> &grid) {
   grid = newGrid;
 }
 
-int main() {
+std::vector<std::pair<int, int>>
+solveMaze(std::vector<std::vector<cellState>> &grid) {
+
   Timer timer;
+
+  const static std::array<std::pair<int, int>, 4> directions = {
+      {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}};
+
+  int startX = 1;
+  int startY = 2;
+
+  const int width = grid.at(0).size();
+  const int height = grid.size();
+
+  std::stack<std::pair<int, int>> cellStack;
+  std::vector<std::pair<int, int>> correctPath;
+  cellStack.push({startX, startY});
+
+  while (!cellStack.empty()) {
+
+    bool moved = false;
+    auto [currX, currY] = cellStack.top();
+
+    if (currX < 1 || currX > width - 2 || currY < 1 || currY > height - 2) {
+      return correctPath;
+    }
+
+    grid.at(currY).at(currX) = PATH;
+
+    for (auto dir : directions) {
+      const int nextX = currX + dir.first;
+      const int nextY = currY + dir.second;
+
+      if (grid.at(nextY).at(nextX) == VISITED) {
+        cellStack.push({nextX, nextY});
+        moved = true;
+        break;
+      }
+    }
+
+    if (!moved) {
+      grid.at(currY).at(currX) = WRONG_PATH;
+      cellStack.pop();
+      correctPath.pop_back();
+    } else {
+      correctPath.emplace_back(currY, currX);
+    }
+  }
+  return correctPath;
+}
+
+int main() {
+
   std::srand(std::time(0));
 
   //   std::pair<int, int> dimensions = getDimensions();
   //   auto [width, height] = dimensions;
   // Ensures odd value by rounding up
 
-
-  int width = 150;
-  int height = 150;
+  int width = 50;
+  int height = 50;
 
   width |= 1;
   height |= 1;
@@ -231,6 +303,7 @@ int main() {
   initializeMaze(grid);
   //   generateNewMazeCellRecursive(startX, startY, grid);
   generateNewMazeCellStack(startX, startY, grid);
+  std::vector<std::pair<int, int>> correctPath = solveMaze(grid);
   //   removeBorder(grid);
-  //   createPicture(grid);
+  createPicture(grid, correctPath);
 }
