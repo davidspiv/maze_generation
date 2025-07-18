@@ -216,7 +216,7 @@ inline void Rgb::print() const {
             << std::endl;
 }
 
-auto clamp255 = [](float x) {
+auto inline clamp255 = [](float x) {
   return static_cast<uint8_t>(std::max(0.f, std::min(1.f, x)) * 255);
 };
 

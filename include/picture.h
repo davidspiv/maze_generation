@@ -110,7 +110,7 @@ public:
   */
   void add(const Picture &other, int x = 0, int y = 0);
 
-  void Scale(const size_t factor);
+  Picture bilinearResize(float factor) const;
 
 private:
   void ensure(int x, int y);

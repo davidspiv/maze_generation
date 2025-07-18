@@ -197,9 +197,20 @@ build/main.o: src/main.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/pstl/glue_numeric_defs.h /usr/include/c++/11/stack \
  /usr/include/c++/11/deque /usr/include/c++/11/bits/stl_deque.h \
  /usr/include/c++/11/bits/deque.tcc /usr/include/c++/11/bits/stl_stack.h \
- src/../include/picture.h src/../include/lodepng.h /usr/include/string.h \
- /usr/include/strings.h src/../include/timer.h /usr/include/c++/11/chrono \
- /usr/include/c++/11/ratio /usr/include/c++/11/bits/parse_numbers.h
+ src/../include/Color_Space.h src/../include/Timer.h \
+ /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
+ /usr/include/c++/11/bits/parse_numbers.h /usr/include/c++/11/iomanip \
+ /usr/include/c++/11/locale \
+ /usr/include/c++/11/bits/locale_facets_nonio.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/time_members.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/messages_members.h \
+ /usr/include/libintl.h /usr/include/c++/11/bits/codecvt.h \
+ /usr/include/c++/11/bits/locale_facets_nonio.tcc \
+ /usr/include/c++/11/bits/locale_conv.h \
+ /usr/include/c++/11/bits/unique_ptr.h \
+ /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/sstream \
+ /usr/include/c++/11/bits/sstream.tcc src/../include/picture.h \
+ src/../include/lodepng.h /usr/include/string.h /usr/include/strings.h
 /usr/include/stdc-predef.h:
 /usr/include/c++/11/algorithm:
 /usr/include/c++/11/utility:
@@ -448,11 +459,25 @@ build/main.o: src/main.cpp /usr/include/stdc-predef.h \
 /usr/include/c++/11/bits/stl_deque.h:
 /usr/include/c++/11/bits/deque.tcc:
 /usr/include/c++/11/bits/stl_stack.h:
+src/../include/Color_Space.h:
+src/../include/Timer.h:
+/usr/include/c++/11/chrono:
+/usr/include/c++/11/ratio:
+/usr/include/c++/11/bits/parse_numbers.h:
+/usr/include/c++/11/iomanip:
+/usr/include/c++/11/locale:
+/usr/include/c++/11/bits/locale_facets_nonio.h:
+/usr/include/x86_64-linux-gnu/c++/11/bits/time_members.h:
+/usr/include/x86_64-linux-gnu/c++/11/bits/messages_members.h:
+/usr/include/libintl.h:
+/usr/include/c++/11/bits/codecvt.h:
+/usr/include/c++/11/bits/locale_facets_nonio.tcc:
+/usr/include/c++/11/bits/locale_conv.h:
+/usr/include/c++/11/bits/unique_ptr.h:
+/usr/include/c++/11/bits/quoted_string.h:
+/usr/include/c++/11/sstream:
+/usr/include/c++/11/bits/sstream.tcc:
 src/../include/picture.h:
 src/../include/lodepng.h:
 /usr/include/string.h:
 /usr/include/strings.h:
-src/../include/timer.h:
-/usr/include/c++/11/chrono:
-/usr/include/c++/11/ratio:
-/usr/include/c++/11/bits/parse_numbers.h:
